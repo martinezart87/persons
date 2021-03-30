@@ -49,7 +49,7 @@ class PersonController extends Controller
         }
     }
 
-    public function show($id)
+    public function show(int $id): object
     {
         $person = DB::select("SELECT * FROM persons WHERE id=?", [$id]);
 
@@ -60,7 +60,7 @@ class PersonController extends Controller
         return response()->json(['status' => false, 'msg' => 'Brak osoby o id ' . $id . '.']);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id): object
     {
         $data = $request->json()->all();
 
@@ -98,7 +98,7 @@ class PersonController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(int $id): object
     {
         DB::beginTransaction();
         try {
