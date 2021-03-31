@@ -10,13 +10,13 @@ use Illuminate\Support\Facades\Validator;
 class PersonController extends Controller
 {
 
-    public function index()
+    public function index(): object
     {
         $persons = DB::select("SELECT * FROM persons");
         return response()->json($persons);
     }
 
-    public function create(Request $request)
+    public function create(Request $request): object
     {
         $data = $request->json()->all();
 
@@ -51,6 +51,10 @@ class PersonController extends Controller
 
     public function show(int $id): object
     {
+        if(!is_int($id)){
+            return response()->json(['status' => false, 'msg' => 'Parametr {id} musi być typu int']);
+        }
+
         $person = DB::select("SELECT * FROM persons WHERE id=?", [$id]);
 
         if ($person) {
