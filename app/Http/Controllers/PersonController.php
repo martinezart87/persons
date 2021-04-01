@@ -38,7 +38,7 @@ class PersonController extends Controller
         }
 
         $person = new Persons;
-        $person->name= trim($data['name']);
+        $person->name = trim($data['name']);
         $person->surname = trim($data['surname']);
         $person->save();
 
@@ -60,44 +60,34 @@ class PersonController extends Controller
         return response()->json(['status' => false, 'msg' => 'Brak osoby o id ' . $id . '.']);
     }
 
-    public function update(Request $request, int $id): object
+    public function update(Persons $person, Request $request, int $id): object
     {
-        //Book::where('publication_place',"Warszawa")->update(['year' => 2010]);
-
         $data = $request->json()->all();
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             return response()->json(['status' => false, 'msg' => 'Błąd JSON: ' . json_last_error_msg()]);
         }
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'surname' => 'required',
-        ]);
+        $validator = Validator::make($request->all(), ['name' => 'required', 'surname' => 'required']);
 
         if ($validator->fails()) {
             return response()->json(['status' => false, 'msg' => $validator->errors()]);
         }
 
-        $person_exists_id = DB::select('SELECT id FROM persons WHERE id=?', [$id]);
-        if (!$person_exists_id) {
-            return response()->json(['status' => false, 'msg' => 'Brak osoboy o id ' . $id]);
-        }
-
-        $person_exists = DB::select('SELECT id FROM persons WHERE name=? AND surname=?', [trim($data['name']), trim($data['surname'])]);
+        $person_exists = $person->where('name', trim($data['name']))
+            ->where('surname', trim($data['surname']))
+            ->first();
         if ($person_exists) {
-            return response()->json(['status' => false, 'msg' => 'Osoba o podanym imieniu i nazwisko jest już w bazie danych. Id: ' . $person_exists[0]->id]);
+            return response()->json(['status' => false, 'msg' => 'Osoba o podanym imieniu i nazwisko jest już w bazie danych. Id: ' . $person_exists->id]);
         }
 
-        DB::beginTransaction();
-        try {
-            DB::update('UPDATE persons SET name=?, surname=? WHERE id=?', [trim($data['name']), trim($data['surname']), $id]);
-            DB::commit();
-            return response()->json(['id' => $id, 'status' => true, 'msg' => 'Zaktualizowano osobę o id ' . $id]);
-        } catch (\Exception $e) {
-            DB::rollback();
-            return response()->json(['status' => false, 'msg' => $e]);
+        $person = $person->find($id);
+        if($person){
+            $person->fill($data);
+            $person->save();
+            return response()->json(['id' => $person->id, 'status' => true, 'msg' => 'Zaktualizowano osobę o id ' . $person->id]);
         }
+        return response()->json(['status' => false, 'msg' => 'Brak osoboy o id ' . $id]);
     }
 
     public function destroy(Persons $person, int $id): object

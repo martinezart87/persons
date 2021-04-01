@@ -10,11 +10,18 @@ class Persons extends Model
     use HasFactory;
 
     /**
-     * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
         'id', 'name', 'surname',
+    ];
+
+    /**
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'created_at', 'updated_at'
     ];
 }
