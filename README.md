@@ -16,7 +16,7 @@ API wykonano z wykorzystaniem:
 
 ## Demo i dokumentacja
 
-http://mswierczek.sldc.pl/
+http://mswierczek.sldc.pl/rest_api/public
 
 
 ## Lokalne uruchomienie
